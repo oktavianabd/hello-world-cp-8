@@ -9,6 +9,8 @@ pipeline {
         ARTIFACTORY_URL = '10.63.20.14:8082'
         ARTIFACTORY_REPO = 'docker-local'
         ARTIFACTORY_CREDENTIALS = credentials('artifactory-publish-jenkins')  // Artifactory credentials
+        DEPLOYMENT_SERVER = '10.63.20.14'
+        SSH_CREDENTIALS = credentials('20-14-deploy-jenkins')  // SSH credentials
     }
 
     stages {
@@ -76,5 +78,28 @@ pipeline {
 								}
 						}
     		}
+
+        stage('Deploy to Server') {
+            steps {
+                sshCommand(
+                    remote: [ 
+                        host: DEPLOYMENT_SERVER, 
+                        credentialsId: SSH_CREDENTIALS 
+                    ],
+                    command: '''
+                        docker pull ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:latest
+                        docker pull ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:latest
+                        docker stop frontend || true
+                        docker rm frontend || true
+                        docker run -d --name frontend -p 80:80 ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:latest
+                        docker stop backend || true
+                        docker rm backend || true
+                        docker run -d --name backend -p 3000:3000 ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:latest
+                    '''
+                )
+            }
+        }
+				
+
 		}
 }
