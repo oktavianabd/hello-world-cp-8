@@ -45,22 +45,50 @@ pipeline {
             }
         }
 
-        stage('Docker Build & Push Frontend') {
-            steps {
-                script {
-                    // Build Docker image
-                    sh 'docker build -t hello-world-app -f frontend/Dockerfile frontend'
+        stage('Docker Build & Push Docker Images') {
+						parallel {
+								stage('Frontend') {
+										steps {
+												script {
 
-                    // Tag Docker image for Artifactory
-                    sh 'docker tag hello-world-app ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/hello-world-app:latest'
+														sh '''VERSION=$(grep '"version":' ./backend/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')'''
+														
+														// Build Docker image
+														sh 'docker build -t frontend -f frontend/Dockerfile frontend'
 
-                    // Login to Artifactory
-                    sh 'echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin'
+														// Tag Docker image for Artifactory
+														sh 'docker tag frontend ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:$VERSION-$BUILD_NUMBER'
 
-                    // Push Docker image to Artifactory
-                    sh 'docker push ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/hello-world-app:latest'
-                }
-            }
-        }
-    }
+														// Login to Artifactory
+														sh 'echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin'
+
+														// Push Docker image to Artifactory
+														sh 'docker push ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:$VERSION-$BUILD_NUMBER'
+												}
+										}
+								}
+
+								stage('Backend') {
+										steps {
+												script {
+
+														sh '''VERSION=$(grep '"version":' ./backend/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')'''
+
+														// Build Docker image
+														sh 'docker build -t backend -f backend/Dockerfile backend'
+
+														// Tag Docker image for Artifactory
+														sh 'docker tag backend ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:$VERSION-$BUILD_NUMBER'
+
+														// Login to Artifactory
+														sh 'echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin'
+
+														// Push Docker image to Artifactory
+														sh 'docker push ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:$VERSION-$BUILD_NUMBER'
+												}
+										}
+								}
+						}
+    		}
+		}
 }
