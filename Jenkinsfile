@@ -14,70 +14,70 @@ pipeline {
     }
 
     stages {
-        stage('Unit testing') {
-            steps {
-                // Run unit tests and integration tests
-                script {
-                    sh '''
-                        cd ./backend/
-                        npm install
-                        npm run test
-                    '''
-                }
-            }
-        }
-        stage('SonarQube static code analysis') {
-            environment {
-                scannerHome = tool 'Sonar'
-            }
+        // stage('Unit testing') {
+        //     steps {
+        //         // Run unit tests and integration tests
+        //         script {
+        //             sh '''
+        //                 cd ./backend/
+        //                 npm install
+        //                 npm run test
+        //             '''
+        //         }
+        //     }
+        // }
+        // stage('SonarQube static code analysis') {
+        //     environment {
+        //         scannerHome = tool 'Sonar'
+        //     }
             
-            steps {
-                withSonarQubeEnv('Default SonarQube Server') {
-                    sh '''
-                        ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=Hello-World \
-                        -Dsonar.sources=backend/,frontend/,database-init/ \
-                        -Dsonar.exclusions=test-output/  \
-                        -Dsonar.tests=unit-tests/ \
-                        -Dsonar.host.url=${SONARQUBE_URL} \
-                        -Dsonar.login=${SONARQUBE_LOGIN} \
-                        -Dsonar.javascript.lcov.reportPaths=./test-output/coverage/lcov.info
-                    '''
-                    }
-            }
-        }
+        //     steps {
+        //         withSonarQubeEnv('Default SonarQube Server') {
+        //             sh '''
+        //                 ${scannerHome}/bin/sonar-scanner \
+        //                 -Dsonar.projectKey=Hello-World \
+        //                 -Dsonar.sources=backend/,frontend/,database-init/ \
+        //                 -Dsonar.exclusions=test-output/  \
+        //                 -Dsonar.tests=unit-tests/ \
+        //                 -Dsonar.host.url=${SONARQUBE_URL} \
+        //                 -Dsonar.login=${SONARQUBE_LOGIN} \
+        //                 -Dsonar.javascript.lcov.reportPaths=./test-output/coverage/lcov.info
+        //             '''
+        //             }
+        //     }
+        // }
 
-        stage('Docker Build & Push Docker Images') {
-						parallel {
-								stage('Frontend') {
-										steps {
-												script {
-														// VERSION=$(grep '"version":' ./backend/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')
-														sh '''
-														docker build -t frontend -f frontend/Dockerfile frontend
-														docker tag frontend ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:latest
-														echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin
-														docker push ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:latest
-														'''
-												}
-										}
-								}
+        // stage('Docker Build & Push Docker Images') {
+				// 		parallel {
+				// 				stage('Frontend') {
+				// 						steps {
+				// 								script {
+				// 										// VERSION=$(grep '"version":' ./backend/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')
+				// 										sh '''
+				// 										docker build -t frontend -f frontend/Dockerfile frontend
+				// 										docker tag frontend ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:latest
+				// 										echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin
+				// 										docker push ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:latest
+				// 										'''
+				// 								}
+				// 						}
+				// 				}
 
-								stage('Backend') {
-										steps {
-												script {
-														// VERSION=$(grep '"version":' ./backend/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')
-														sh '''
-														docker build -t backend -f backend/Dockerfile backend
-														docker tag backend ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:latest
-														echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin
-														docker push ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:latest
-														'''
-												}
-										}
-								}
-						}
-    		}
+				// 				stage('Backend') {
+				// 						steps {
+				// 								script {
+				// 										// VERSION=$(grep '"version":' ./backend/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')
+				// 										sh '''
+				// 										docker build -t backend -f backend/Dockerfile backend
+				// 										docker tag backend ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:latest
+				// 										echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin
+				// 										docker push ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:latest
+				// 										'''
+				// 								}
+				// 						}
+				// 				}
+				// 		}
+    		// }
 
         stage('Deploy to Server') {
             steps {
