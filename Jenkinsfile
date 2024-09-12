@@ -83,6 +83,7 @@ pipeline {
             steps {
                 sshCommand(
                     remote: [ 
+												user: 'root',
 												name: 'deploy-server',
                         host: '${DEPLOYMENT_SERVER}', 
                         credentialsId: '${SSH_CREDENTIALS}' 
