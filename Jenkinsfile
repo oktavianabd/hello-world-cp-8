@@ -52,10 +52,10 @@ pipeline {
 												script {
 														sh '''
 														VERSION=$(grep '"version":' ./backend/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')
-														docker build -t frontend -f frontend/Dockerfile frontend'
-														docker tag frontend ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:$VERSION-$BUILD_NUMBER'
-														echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin'
-														docker push ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:$VERSION-$BUILD_NUMBER'
+														docker build -t frontend -f frontend/Dockerfile frontend
+														docker tag frontend ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:$VERSION-$BUILD_NUMBER
+														echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin
+														docker push ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:$VERSION-$BUILD_NUMBER
 														'''
 												}
 										}
@@ -66,10 +66,10 @@ pipeline {
 												script {
 														sh '''
 														VERSION=$(grep '"version":' ./backend/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')
-														docker build -t backend -f backend/Dockerfile backend'
-														docker tag backend ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:$VERSION-$BUILD_NUMBER'
-														echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin'
-														docker push ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:$VERSION-$BUILD_NUMBER'
+														docker build -t backend -f backend/Dockerfile backend
+														docker tag backend ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:$VERSION-$BUILD_NUMBER
+														echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin
+														docker push ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:$VERSION-$BUILD_NUMBER
 														'''
 												}
 										}
