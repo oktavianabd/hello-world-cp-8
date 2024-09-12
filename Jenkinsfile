@@ -83,9 +83,9 @@ pipeline {
             steps {
                 sshCommand(
                     remote: [ 
-												name: deploy-server,
-                        host: DEPLOYMENT_SERVER, 
-                        credentialsId: SSH_CREDENTIALS 
+												name: 'deploy-server',
+                        host: '${DEPLOYMENT_SERVER}', 
+                        credentialsId: '${SSH_CREDENTIALS}' 
                     ],
                     command: '''
                         docker pull ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:latest
