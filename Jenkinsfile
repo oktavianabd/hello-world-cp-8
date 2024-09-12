@@ -50,20 +50,13 @@ pipeline {
 								stage('Frontend') {
 										steps {
 												script {
-
-														sh '''VERSION=$(grep '"version":' ./backend/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')'''
-														
-														// Build Docker image
-														sh 'docker build -t frontend -f frontend/Dockerfile frontend'
-
-														// Tag Docker image for Artifactory
-														sh 'docker tag frontend ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:$VERSION-$BUILD_NUMBER'
-
-														// Login to Artifactory
-														sh 'echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin'
-
-														// Push Docker image to Artifactory
-														sh 'docker push ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:$VERSION-$BUILD_NUMBER'
+														sh '''
+														VERSION=$(grep '"version":' ./backend/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')
+														docker build -t frontend -f frontend/Dockerfile frontend'
+														docker tag frontend ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:$VERSION-$BUILD_NUMBER'
+														echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin'
+														docker push ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/frontend:$VERSION-$BUILD_NUMBER'
+														'''
 												}
 										}
 								}
@@ -71,20 +64,13 @@ pipeline {
 								stage('Backend') {
 										steps {
 												script {
-
-														sh '''VERSION=$(grep '"version":' ./backend/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')'''
-
-														// Build Docker image
-														sh 'docker build -t backend -f backend/Dockerfile backend'
-
-														// Tag Docker image for Artifactory
-														sh 'docker tag backend ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:$VERSION-$BUILD_NUMBER'
-
-														// Login to Artifactory
-														sh 'echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin'
-
-														// Push Docker image to Artifactory
-														sh 'docker push ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:$VERSION-$BUILD_NUMBER'
+														sh '''
+														VERSION=$(grep '"version":' ./backend/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')
+														docker build -t backend -f backend/Dockerfile backend'
+														docker tag backend ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:$VERSION-$BUILD_NUMBER'
+														echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin'
+														docker push ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:$VERSION-$BUILD_NUMBER'
+														'''
 												}
 										}
 								}
