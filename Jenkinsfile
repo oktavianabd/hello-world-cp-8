@@ -68,6 +68,7 @@ pipeline {
 												script {
 														// VERSION=$(grep '"version":' ./backend/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')
 														sh '''
+                                                        sed -i '/^COPY . \.\/$/a RUN touch ~/.npmrc; chmod 600 ~/.npmrc; npm config set registry="http://10.63.21.100:31288/repository/npm-registry-proxy/"; npm config set _auth="$NEXUS_PSW_ONE"; npm config set always-auth=false' backend/Dockerfile                                                        
 														docker build -t backend -f backend/Dockerfile backend
 														docker tag backend ${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/backend:latest
 														echo ${ARTIFACTORY_CREDENTIALS_PSW} | docker login ${ARTIFACTORY_URL} -u ${ARTIFACTORY_CREDENTIALS_USR} --password-stdin
