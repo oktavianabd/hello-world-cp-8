@@ -12,7 +12,7 @@ COPY . ./
 
 # Install the Node.js dependencies from the package.json file
 #RUN npm install
-RUN yarn install
+RUN yarn install --silent --no-progress > /dev/null 2>&1
 
 # Define the default command to run the application using npm start
 CMD ["npm", "start"]
