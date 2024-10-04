@@ -5,7 +5,7 @@ FROM node:14.15.1
 WORKDIR /app
 
 # Copy both package.json and package-lock.json (if available) to the working directory
-COPY package*.json ./
+COPY backend/package*.json ./
 
 # Copy the rest of the application files (excluding node_modules) into the container
 COPY . ./
